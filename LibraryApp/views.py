@@ -42,3 +42,28 @@ def delete_book(request,id):
     book = get_object_or_404(Library,id=id)
     book.delete()
     return Response({"message":"Book deleted successfully"})
+
+
+# METHOD 1: search a book by name using POST
+@api_view(['POST'])
+def search_book(request):
+    book_name = request.data.get("book_name" , "")
+    if not book_name:
+        return Response({"error":"Please provide a valid book name"})
+    book = Library.objects.filter(book_name__icontains=book_name)
+    serializer = LibrarySerializer(book, many = True)
+    if book.exists():
+        return Response(serializer.data)
+    return Response({"message":"No books found matching the search."})
+    
+# METHOD 2: search book by name using GET
+@api_view(['GET'])
+def search_books(request):
+    book_name = request.GET.get("book_name", "")
+    if not book_name:
+        return Response({"error": "Please provide a valid book name"})
+    books = Library.objects.filter(book_name__icontains=book_name)
+    serializer = LibrarySerializer(books, many=True)
+    if books.exists():
+        return Response(serializer.data)
+    return Response({"message": "No books found matching the search."})
