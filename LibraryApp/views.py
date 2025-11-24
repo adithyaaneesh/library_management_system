@@ -23,3 +23,22 @@ def add_book(request):
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors)
+
+
+# update book
+@api_view(['POST'])
+def update_book(request,id):
+    book = Library.objects.get(id=id)
+    serializer = LibrarySerializer(instance = book, data = request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors)
+
+
+# delete a book
+@api_view(['DELETE'])
+def delete_book(request,id):
+    book = get_object_or_404(Library,id=id)
+    book.delete()
+    return Response({"message":"Book deleted successfully"})
